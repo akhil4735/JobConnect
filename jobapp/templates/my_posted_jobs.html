@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}My Posted Jobs{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">My Posted Jobs</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if posted_jobs %}
+                {% for job in posted_jobs %}
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ job.title }}</h5>
+                            <span class="badge bg-primary">{{ job.job_type }}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <p><strong>Company:</strong> {{ job.company|default:"Not specified" }}</p>
+                                    <p><strong>Location:</strong> {{ job.location }}</p>
+                                    {% if job.salary %}
+                                        <p><strong>Salary:</strong> ${{ job.salary }}</p>
+                                    {% endif %}
+                                    {% if job.category %}
+                                        <p><strong>Category:</strong> {{ job.category }}</p>
+                                    {% endif %}
+                                    <p><strong>Posted:</strong> {{ job.created_at|date:"M d, Y" }}</p>
+                                    <p><strong>Description:</strong></p>
+                                    <div class="bg-light p-3 rounded">
+                                        {{ job.description|linebreaks }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>Applications ({{ job_applications|length }})</h6>
+                                    {% if job_applications %}
+                                        {% for application in job_applications %}
+                                            <div class="card mb-2">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">{{ application.applicant.username }}</h6>
+                                                    <p class="card-text">
+                                                        <small class="text-muted">Applied: {{ application.applied_at|date:"M d, Y" }}</small><br>
+                                                        <span class="badge bg-{% if application.application_status == 'Accepted' %}success{% elif application.application_status == 'Rejected' %}danger{% else %}warning{% endif %}">
+                                                            {{ application.application_status }}
+                                                        </span>
+                                                    </p>
+                                                    <a href="{% url 'view_application' application.id %}" class="btn btn-primary btn-sm">View Details</a>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-muted">No applications yet.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center">
+                    <h4 class="text-muted">You haven't posted any jobs yet.</h4>
+                    <a href="{% url 'post_job' %}" class="btn btn-primary">Post Your First Job</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

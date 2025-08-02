@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Application Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Application Details</h2>
+                <a href="{% url 'my_applications' %}" class="btn btn-outline-secondary">Back to Applications</a>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="row">
+                <!-- Job Information -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Job Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">{{ application.job.title }}</h6>
+                            <p class="card-text"><strong>Company:</strong> {{ application.job.company|default:"Not specified" }}</p>
+                            <p class="card-text"><strong>Location:</strong> {{ application.job.location }}</p>
+                            <p class="card-text"><strong>Job Type:</strong> {{ application.job.job_type }}</p>
+                            <p class="card-text"><strong>Salary:</strong> {% if application.job.salary %}${{ application.job.salary }}{% else %}Not specified{% endif %}</p>
+                            <p class="card-text"><strong>Category:</strong> {{ application.job.category|default:"Not specified" }}</p>
+                            <p class="card-text"><strong>Posted:</strong> {{ application.job.created_at|date:"M d, Y" }}</p>
+                            {% if application.job.deadline %}
+                                <p class="card-text"><strong>Deadline:</strong> {{ application.job.deadline|date:"M d, Y" }}</p>
+                            {% endif %}
+                            <a href="{% url 'job_detail' application.job.id %}" class="btn btn-outline-primary btn-sm">View Job Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Information -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Application Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text"><strong>Applicant:</strong> {{ application.applicant.username }}</p>
+                            <p class="card-text"><strong>Applied Date:</strong> {{ application.applied_at|date:"M d, Y H:i" }}</p>
+                            <p class="card-text">
+                                <strong>Status:</strong> 
+                                {% if application.application_status == "Pending" %}
+                                    <span class="badge bg-warning text-dark">Pending Review</span>
+                                {% elif application.application_status == "Accepted" %}
+                                    <span class="badge bg-success">Accepted</span>
+                                {% elif application.application_status == "Rejected" %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% endif %}
+                            </p>
+
+                            {% if application.resume %}
+                                <p class="card-text">
+                                    <strong>Resume:</strong> 
+                                    <a href="{{ application.resume.url }}" target="_blank" class="btn btn-outline-info btn-sm">
+                                        <i class="bi bi-download"></i> Download Resume
+                                    </a>
+                                </p>
+                            {% else %}
+                                <p class="card-text"><strong>Resume:</strong> <span class="text-muted">No resume uploaded</span></p>
+                            {% endif %}
+
+                            <!-- Status Management (only for job poster) -->
+                            {% if user == application.job.posted_by and application.application_status == "Pending" %}
+                                <div class="mt-3">
+                                    <h6>Update Application Status:</h6>
+                                    <form method="post" action="{% url 'update_application_status' application.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="status" value="Accepted">
+                                        <button type="submit" class="btn btn-success btn-sm">Accept Application</button>
+                                    </form>
+                                    <form method="post" action="{% url 'update_application_status' application.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="status" value="Rejected">
+                                        <button type="submit" class="btn btn-danger btn-sm">Reject Application</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cover Letter -->
+            {% if application.cover_letter %}
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Cover Letter</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="bg-light p-3 rounded">
+                                {{ application.cover_letter|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Job Description -->
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Job Description</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="bg-light p-3 rounded">
+                                {{ application.job.description|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

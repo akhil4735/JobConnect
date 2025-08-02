@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}My Job Applications{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">My Job Applications</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if applications %}
+                <div class="row">
+                    {% for app in applications %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ app.job.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ app.job.company|default:"Company not specified" }}</h6>
+                                
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="bi bi-geo-alt"></i> {{ app.job.location }}<br>
+                                        <i class="bi bi-briefcase"></i> {{ app.job.job_type }}<br>
+                                        <i class="bi bi-calendar"></i> Applied: {{ app.applied_at|date:"M d, Y" }}
+                                    </small>
+                                </p>
+                                
+                                <div class="mb-3">
+                                    {% if app.application_status == "Pending" %}
+                                        <span class="badge bg-warning text-dark">Pending Review</span>
+                                    {% elif app.application_status == "Accepted" %}
+                                        <span class="badge bg-success">Accepted</span>
+                                    {% elif app.application_status == "Rejected" %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'view_application' app.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                                    <a href="{% url 'job_detail' app.job.id %}" class="btn btn-outline-secondary btn-sm">View Job</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">No Applications Yet</h5>
+                            <p class="card-text">You haven't applied for any jobs yet. Start exploring available positions!</p>
+                            <a href="{% url 'job_list' %}" class="btn btn-primary">Browse Jobs</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

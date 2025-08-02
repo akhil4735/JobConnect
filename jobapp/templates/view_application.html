@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Application Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Application Details</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ application.job.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Job Information</h6>
+                            <p><strong>Company:</strong> {{ application.job.company|default:"Not specified" }}</p>
+                            <p><strong>Location:</strong> {{ application.job.location }}</p>
+                            <p><strong>Job Type:</strong> {{ application.job.job_type }}</p>
+                            {% if application.job.salary %}
+                                <p><strong>Salary:</strong> ${{ application.job.salary }}</p>
+                            {% endif %}
+                            <p><strong>Posted:</strong> {{ application.job.created_at|date:"M d, Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Applicant Information</h6>
+                            <p><strong>Name:</strong> {{ application.applicant.username }}</p>
+                            <p><strong>Applied:</strong> {{ application.applied_at|date:"M d, Y" }}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge bg-{% if application.application_status == 'Accepted' %}success{% elif application.application_status == 'Rejected' %}danger{% else %}warning{% endif %}">
+                                    {{ application.application_status }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h6>Cover Letter</h6>
+                            <div class="bg-light p-3 rounded">
+                                {% if application.cover_letter %}
+                                    {{ application.cover_letter|linebreaks }}
+                                {% else %}
+                                    <p class="text-muted">No cover letter provided.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if application.resume %}
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6>Resume</h6>
+                                <a href="{{ application.resume.url }}" class="btn btn-primary" target="_blank">
+                                    <i class="fas fa-download"></i> Download Resume
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if user == application.job.posted_by %}
+                        <hr>
+                        <div class="row">
+                            <div class="col-12">
+                                <h6>Update Application Status</h6>
+                                <form method="post" action="{% url 'update_application_status' application.id %}">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <select name="status" class="form-select">
+                                                <option value="Pending" {% if application.application_status == 'Pending' %}selected{% endif %}>Pending</option>
+                                                <option value="Accepted" {% if application.application_status == 'Accepted' %}selected{% endif %}>Accepted</option>
+                                                <option value="Rejected" {% if application.application_status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button type="submit" class="btn btn-primary">Update Status</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'my_posted_jobs' %}" class="btn btn-secondary">Back to My Posted Jobs</a>
+                <a href="{% url 'my_applications' %}" class="btn btn-secondary">Back to My Applications</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

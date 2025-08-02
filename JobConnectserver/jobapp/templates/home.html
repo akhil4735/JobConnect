@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-primary text-center">Welcome to the Job Portal</h2>
+    <p class="text-center">Find your dream job or post a new job opportunity.</p>
+
+    <div class="text-center">
+        <a href="{% url 'job_list' %}" class="btn btn-primary">View Jobs</a>
+        {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'post_job' %}" class="btn btn-success">Post a Job</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

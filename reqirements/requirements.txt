@@ -1,0 +1,40 @@
+job_portal/                    # Root project directory
+│── manage.py                  # Django management script
+│── requirements.txt           # Dependencies
+│── db.sqlite3                 # Database (if using SQLite)
+│
+├── job_portal/                # Main project settings
+│   │── __init__.py
+│   │── settings.py            # Django project settings
+│   │── urls.py                # Project-level URL routing
+│   │── wsgi.py
+│   │── asgi.py
+│
+├── jobapp/                    # Single Django app for everything
+│   │── migrations/            # Database migrations
+│   │── templates/             # All HTML templates
+│   │   ├── base.html          # Base template
+│   │   ├── home.html          # Homepage
+│   │   
+│   │   ├── job_list.html  # Job listings page
+│   │   ├── job_detail.html# Job details page
+│   │   ├# User-related templates
+│   │   │├── login.html     # Login page
+│   │   │├── register.html  # Registration page
+│   │   │├── profile.html   # Profile page
+│   │   ├#Job application templates
+│   │   │├── apply.html     # Job application form
+│   │   ├# Chat-related templates
+│   │── static/                # Static files (CSS, JS, Images)
+│   │   ├── css/
+│   │   ├── js/
+│   │   ├── images/
+│   │── __init__.py
+│   │── admin.py               # Django Admin configurations
+│   │── apps.py
+│   │── models.py              # All database models
+│   │── views.py               # All views (jobs, users, applications, chat, feedback)
+│   │── urls.py                # URL routing for everything
+│   │── forms.py               # Django forms for authentication, job applications, etc.
+│
+└── media/                     # User-uploaded files (resumes, images)

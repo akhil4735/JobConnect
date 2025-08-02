@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}My Posted Jobs{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">My Posted Jobs</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if posted_jobs %}
+                <div class="accordion" id="jobsAccordion">
+                    {% for job in posted_jobs %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ job.id }}">
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ job.id }}">
+                                <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                    <div>
+                                        <strong>{{ job.title }}</strong> - {{ job.company|default:"Company not specified" }}
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-primary">{{ job.job_type }}</span>
+                                        <span class="badge bg-secondary">{{ job.location }}</span>
+                                    </div>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="collapse{{ job.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#jobsAccordion">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5>Job Details</h5>
+                                        <p><strong>Description:</strong> {{ job.description|truncatewords:30 }}</p>
+                                        <p><strong>Salary:</strong> {% if job.salary %}${{ job.salary }}{% else %}Not specified{% endif %}</p>
+                                        <p><strong>Category:</strong> {{ job.category|default:"Not specified" }}</p>
+                                        <p><strong>Posted:</strong> {{ job.created_at|date:"M d, Y" }}</p>
+                                        {% if job.deadline %}
+                                            <p><strong>Deadline:</strong> {{ job.deadline|date:"M d, Y" }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5>Applications ({{ job_applications|get_item:job.id|length }})</h5>
+                                        {% if job_applications|get_item:job.id %}
+                                            <div class="list-group">
+                                                {% for application in job_applications|get_item:job.id %}
+                                                <div class="list-group-item">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <h6 class="mb-1">{{ application.applicant.username }}</h6>
+                                                            <small class="text-muted">Applied: {{ application.applied_at|date:"M d, Y" }}</small>
+                                                        </div>
+                                                        <div class="text-end">
+                                                            {% if application.application_status == "Pending" %}
+                                                                <span class="badge bg-warning text-dark">Pending</span>
+                                                            {% elif application.application_status == "Accepted" %}
+                                                                <span class="badge bg-success">Accepted</span>
+                                                            {% elif application.application_status == "Rejected" %}
+                                                                <span class="badge bg-danger">Rejected</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="mt-2">
+                                                        <a href="{% url 'view_application' application.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                                        
+                                                        {% if application.application_status == "Pending" %}
+                                                            <form method="post" action="{% url 'update_application_status' application.id %}" class="d-inline">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="status" value="Accepted">
+                                                                <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                                                            </form>
+                                                            <form method="post" action="{% url 'update_application_status' application.id %}" class="d-inline">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="status" value="Rejected">
+                                                                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <p class="text-muted">No applications yet.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">No Posted Jobs Yet</h5>
+                            <p class="card-text">You haven't posted any jobs yet. Start posting jobs to find great candidates!</p>
+                            <a href="{% url 'post_job' %}" class="btn btn-primary">Post a Job</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

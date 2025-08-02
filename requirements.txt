@@ -1,0 +1,9 @@
+Django>=4.2,<5.0
+pymysql
+mysqlclient>=2.2.0
+Pillow>=10.0.0
+django-crispy-forms>=2.0
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+dj-static>=0.0.6
+django-extensions>=3.2.3
